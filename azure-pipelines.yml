@@ -2,30 +2,32 @@ trigger:
 - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'demovmpool'
 
 variables:
-  resourceGroupName: 'myResourceGroup'
+  resourceGroupName: 'demoRG1'
   location: 'UKSouth'
-  deploymentName: 'vm-deployment'
+  deploymentName: 'demovm-deployment'
 
 steps:
+- script: |
+    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    az --version
+  displayName: 'Install Azure CLI'
 - task: AzureCLI@2
   inputs:
-    azureSubscription: '<Your Azure Service Connection Name>'
+    azureSubscription: 'Pay-As-You-Go-Nonprod'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
-      # Login to Azure
-      az group create --name ${{ variables.resourceGroupName }} --location ${{ variables.location }}
-
-      # Deploy the ARM template
+      az group create --name mydemorg1 --location UKSouth
       az deployment group create \
-        --resource-group ${{ variables.resourceGroupName }} \
+        --resource-group mydemorg1 \
         --template-file vm-template.json \
-        --parameters location=${{ variables.location }} \
-                    vmName=myUbuntuVM \
+        --parameters location=UKSouth \
+                    vmName=myUbuntuVM1 \
                     adminUsername=azureuser \
-                    adminPassword='SecureP@ssword123!'
+                    adminPassword='SecureP@ssword123!' \
+                    nicName=abcone
 
       echo "VM deployment completed successfully!"
