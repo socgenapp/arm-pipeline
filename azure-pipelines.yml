@@ -6,7 +6,7 @@ pool:
 
 variables:
   resourceGroupName: 'myResourceGroup'
-  location: 'East US'
+  location: 'UKSouth'
   deploymentName: 'vm-deployment'
 
 steps:
@@ -22,11 +22,10 @@ steps:
       # Deploy the ARM template
       az deployment group create \
         --resource-group ${{ variables.resourceGroupName }} \
-        --template-file arm-templates/vm-template.json \
+        --template-file vm-template.json \
         --parameters location=${{ variables.location }} \
                     vmName=myUbuntuVM \
                     adminUsername=azureuser \
-                    adminPassword='SecureP@ssword123!' \
-                    nicName=myNic
+                    adminPassword='SecureP@ssword123!'
 
       echo "VM deployment completed successfully!"
