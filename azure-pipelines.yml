@@ -1,0 +1,32 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  resourceGroupName: 'myResourceGroup'
+  location: 'East US'
+  deploymentName: 'vm-deployment'
+
+steps:
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: '<Your Azure Service Connection Name>'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      # Login to Azure
+      az group create --name ${{ variables.resourceGroupName }} --location ${{ variables.location }}
+
+      # Deploy the ARM template
+      az deployment group create \
+        --resource-group ${{ variables.resourceGroupName }} \
+        --template-file arm-templates/vm-template.json \
+        --parameters location=${{ variables.location }} \
+                    vmName=myUbuntuVM \
+                    adminUsername=azureuser \
+                    adminPassword='SecureP@ssword123!' \
+                    nicName=myNic
+
+      echo "VM deployment completed successfully!"
