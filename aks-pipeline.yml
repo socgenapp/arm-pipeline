@@ -1,0 +1,36 @@
+trigger:
+- main
+
+pool:
+  name: 'demovmpool'
+
+variables:
+  resourceGroupName: 'demoRG1'
+  location: 'UKSouth'
+  deploymentName: 'demovm-deployment'
+
+steps:
+- script: |
+    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+    az --version
+  displayName: 'Install Azure CLI'
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'Pay-As-You-Go-Nonprod'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      az group create --name mydemorg1 --location UKSouth
+      # az sshkey create --name "mySSHKey" --resource-group "mydemorg1"
+      # ssh-keygen -t rsa -b 4096
+      # az sshkey show --name "mySSHKey" --resource-group "mydemorg1" --query "publicKey"
+      # PUBLIC_KEY=$(az sshkey show --name "mySSHKey" --resource-group "mydemorg1" --query "publicKey" -o tsv)
+      #PUBLIC_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDyzoBg5yem1aKXo0b3oHgkTdIHnU4kWlI7X50gIAouz5BwKhLKWi8VGz4ZaJH6TuuUkUMsan02SSRUUQhiHtJQdMlAWnG9U1tP0BW/kD51uWAm6wDTgXxhtXuNJuIbjQxCsgOlOUV5VaFFn4NfZXMPgs7q38OBNqH5j5BkZCr/tVJKo8W/jp7K3aZVTOio2lq6u/Es7JMoTqJqIHKmufjl7EkifsWB8qMaZPeNW0N+bVWUZteN9GyMVeLZQjb1i6P6CTRYHMzMCuU8gz+VqYXAo6ZA+/Pyw/85p9dz/qHlQolJ3A10924EYhTpS3VRF/MxFBd/cOBQsdfjxOKqY86akhoHHWzl+M6jwoAGjg7jan5H4Tn2xfRetzNamg9nAnqMUDGR1H72KKX+ShB9Q7bgalN5eaNX74m5D877XEfbrQ9z6aVWwOcCvsKhXj9pR/gtCfP1B2y7vvbEbeQgNAzoiBQRT/Q54nx0gOs0Vw3eho+xfsOCPsqmWlynwPvOPUE= generated-by-azure"
+      
+      az deployment group create \
+        --resource-group mydemorg1 \
+        --template-file aks-template.json \
+        --parameters location=UKSouth \
+                     clusterName=raviakscluster
+                     
+      echo "aks cluster created successfully!"
